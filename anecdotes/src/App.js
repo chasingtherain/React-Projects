@@ -1,22 +1,22 @@
 import {useState} from 'react'
 
-const Display = ({anecdotes,selected,voteCount}) => {
+const Display = ({name,anecdotes,selected,voteCount}) => {
   let chosen = voteCount[selected]
   // console.log(voteCount,selected,chosen)
   return (
     <div>
-      <h2>Anecdote of the day</h2>
+      <h2>{name}</h2>
       <h4>{anecdotes[selected]}</h4>
       <span>has been voted <strong>{chosen}</strong> times</span>
     </div>
   )
 }
 
-const MostVotedDisplay = ({anecdotes,selected,voteCount}) => {
+const MostVotedDisplay = ({name,anecdotes,selected,voteCount}) => {
   let mostVoted = voteCount.indexOf(Math.max(...voteCount))
   if(voteCount.reduce((c,v)=>c+v) === 0) return(
     <div>
-    <h2>Most Voted Anecdote</h2>
+    <h2>{name}</h2>
     <p>To be determined</p>
   </div>
   )
@@ -66,10 +66,12 @@ const App = () => {
 
   return (
     <div>
-      <Display anecdotes = {anecdotes} selected={selected} voteCount={voteCount}/>
-      <Button text="Next Quote" onClick= {handleClick} />
-      <Button text="Vote" onClick={upVote}/>
-      <MostVotedDisplay anecdotes = {anecdotes} selected={selected} voteCount={voteCount}/>
+      <Display name ={"Anecdote of the day"}  anecdotes = {anecdotes} selected={selected} voteCount={voteCount}/>
+      <div>
+        <Button text="Next Quote" onClick= {handleClick} />
+        <Button text="Vote" onClick={upVote}/>
+      </div>
+      <MostVotedDisplay name ={"Most Voted Anecdote"} anecdotes = {anecdotes} selected={selected} voteCount={voteCount}/>
     </div>
   )
 }
