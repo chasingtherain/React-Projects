@@ -1,0 +1,19 @@
+{
+    "persons": [
+        { 
+            "name": "Arto Hellas", 
+            "number": "183-012-30112", 
+            "id": 1
+        },
+        { 
+            "name": "Arturo Hellius", 
+            "number": "182-028-30912", 
+            "id": 2
+        },
+        { 
+            "name": "Artuno Dos", 
+            "number": "185-028-30330", 
+            "id": 3
+        }
+      ]
+}

@@ -2,7 +2,7 @@ const Form = ({addNewContact,newName,handleNewName,newNum,handleNewNum}) => {
     return(
       <form onSubmit={addNewContact}>
       <div>
-        name: <input value={newName} onChange={handleNewName}/>
+        name: <input value={newName} onChange={handleNewName}/><br></br>
         number: <input value={newNum} onChange={handleNewNum}/>
       </div>
       <div>
