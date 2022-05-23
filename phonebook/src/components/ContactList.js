@@ -1,12 +1,12 @@
 import List from "./List"
 
-const ContactList = ({displaySearch}) => {
+const ContactList = ({displaySearch, handleRemoveButton}) => {
     return(
       <div>
         <ul>
         {
           displaySearch.map(person =>
-           <li> <List key= {person.id} person={person}/> </li>
+           <li> <List person={person} handleRemoveButton={handleRemoveButton}/> </li>
           )
         }
           </ul>
