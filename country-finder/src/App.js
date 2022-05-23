@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+
 const SearchBar = ({input,handleSearch}) => {
   return(
     <div>
@@ -9,7 +10,7 @@ const SearchBar = ({input,handleSearch}) => {
   )
 }
 
-const List = ({countryList,displaySearch,showAll}) => {
+const List = ({countryList,displaySearch,handleClick,showAll}) => {
 
   if(displaySearch.length > 10 && showAll === false){
     return(
@@ -18,6 +19,19 @@ const List = ({countryList,displaySearch,showAll}) => {
       </div>
     )
   } 
+
+  if(showAll === true){
+    return(
+      <div>
+        <ul>
+          {displaySearch.sort().map(
+            cName => 
+              <li>{cName}</li>
+            )}
+        </ul>
+      </div>
+    )
+  }
 
   if(displaySearch.length === 1){
     let countryInfo = countryList.filter((country) => country.name.common === displaySearch[0])
@@ -39,18 +53,58 @@ const List = ({countryList,displaySearch,showAll}) => {
           {languageList.map(lang => <li>{lang}</li>)}
         </ul>
         <img src={countryFlag} alt={countryName}/>
+        <Weather capital={capital}/>
 
       </div>
     )
   } 
-
   return(
     <div>
-      <ul>{displaySearch.sort().map(cName => <li>{cName}</li>)}</ul>
+      <ul>
+        {displaySearch.sort().map(
+          cName => 
+            <li>{cName} <button id={cName} onClick={handleClick}>show</button> </li>
+          )}
+      </ul>
     </div>
   )
 
 
+}
+
+const Weather = ({capital}) => {
+  const [countryWeather, setCountryWeather] = useState()
+  const [wind, setWind] = useState()
+  const [temp, setTemp] = useState()
+  const [iconName, setIconName] = useState()
+  const weather_api_key = process.env.REACT_APP_WEATHER_API_KEY
+  const WEATHER_URL= `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${weather_api_key}`
+  let iconUrl = `http://openweathermap.org/img/wn/${iconName}@2x.png`
+
+
+  const weatherHook = () => {
+    axios
+      .get(WEATHER_URL)
+      .then(resp => {
+        setCountryWeather(resp.data)
+        setWind(resp.data["wind"].speed);
+        setTemp(((resp.data["main"].temp - 32) * 5 / 9).toFixed(2))
+        setIconName(resp.data["weather"][0].icon)
+      })
+    }
+  useEffect(weatherHook,[WEATHER_URL])
+  // console.log(countryWeather["weather"])
+  // console.log(countryWeather,iconName)
+  
+  return(
+    <div>
+      <h3>Weather in {capital}</h3>
+      <p>temperature: {temp} celsius</p>
+      <img src= {iconUrl} alt="weather icon"/>
+      <p>wind: {wind} m/s</p>
+  
+    </div>
+  )
 }
 
 const App = () => {
@@ -61,11 +115,17 @@ const App = () => {
   let country = countryList.map(item => item.name.common)
   const displaySearch = showAll ? country : country.filter((country) => country.toLowerCase().includes(search.toLowerCase()))
 
-  useEffect( ()=>{
+  const countryListHook = ()=>{
     axios
       .get("https://restcountries.com/v3.1/all")
       .then(resp => setCountryList(resp.data))
-  }, [])
+  }
+
+  // console.log(country)
+
+  useEffect(countryListHook,[])
+
+
 
   const handleSearch = (event) => {
     setSearch(event.target.value)
@@ -73,15 +133,16 @@ const App = () => {
     else setShowAll(true)
     
   }
-  // console.log(search)
-  // console.log(countryList);
-  // console.log(displaySearch.length);
+
+  const handleClick = (event) => {
+    setSearch(event.target.id)
+  }
 
   return (
     <div>
       <h2>Country Finder</h2>
       <SearchBar input handleSearch={handleSearch}/>
-      <List countryList={countryList} displaySearch={displaySearch} showAll={showAll} search={search}/>
+      <List countryList={countryList} displaySearch={displaySearch} showAll={showAll} search={search} handleClick={handleClick} />
     </div>
   )
 }
