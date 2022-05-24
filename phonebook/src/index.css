@@ -1,0 +1,31 @@
+body {
+    color: green;
+  }
+
+input{
+    margin-top: 5px;
+}
+
+button{
+    margin-top: 10px;
+    width: 45px;
+}
+
+#name{
+    margin-right: 14px;
+}
+
+#search{
+    margin-right: 8px;
+}
+
+.notification{
+    color: red;
+    background: rgb(232, 231, 231);
+    font-size: 20px;
+    border-style: solid;
+    border-radius: 5px;
+    font-weight: 600;
+    padding: 10px;
+    margin-bottom: 10px;
+}

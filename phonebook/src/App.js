@@ -5,12 +5,30 @@ import ContactList from './components/ContactList'
 import axios from 'axios'
 import directoryService from './services/phone-directory'
 
+const Notification = ({notificationMsg,notificationType}) => {
+  let notificationStyle = {color: "blue"}
+  if(notificationType === "add"){notificationStyle = {color: "green"}}
+  if(notificationType === "delete"){notificationStyle = {color: "red"}}
+  if(notificationType === "invalid"){notificationStyle = {color: "red"}}
+
+  if (notificationMsg == null){
+    return null
+  }
+  return(
+    <div style={notificationStyle} className="notification">
+      {notificationMsg}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNum, setNewNum] = useState('')
   const [newSearch, setNewSearch] = useState('')
   const [showAll, setShowAll] = useState(true)
+  const [notificationMsg, setNotificationMsg] = useState()
+  const [notificationType,setNotificationType] = useState()
 
   // useEffect(()=>{
   //   axios
@@ -41,21 +59,26 @@ const App = () => {
 
   const handleRemoveButton = (event) => {
     let removedId = parseInt(event.target.id)
-    console.log(removedId)
+
     if(window.confirm(`Delete ${event.target.name}?`)){
       directoryService
         .remove(removedId)
         .then(resp => {
-          alert(`${resp.status}: ${event.target.name} was deleted`)
+          setNotificationType("delete")
+          setNotificationMsg(`${event.target.name} was deleted`)
+          setTimeout(() => {setNotificationMsg(null)}, 5000);
           setPersons(persons.filter(person => person.id !== removedId))
         })
         .catch(error => {
-          alert("user already deleted")
+          setNotificationMsg(`${event.target.name} has already been removed from database`)
+          setTimeout(() => {setNotificationMsg(null)}, 5000);
         })
+        setNotificationType("")
     }
 
   }
 
+  // displays countries that match search input
   const displaySearch = showAll 
     ? persons
     : persons.filter(person => person.name.toLowerCase().includes(newSearch.toLowerCase()))
@@ -67,9 +90,8 @@ const App = () => {
     const contactObject = {
       name: newName,
       number: newNum,
-      id: persons.length + 1
+      id: Math.floor(Math.random() * 999999999999)
     }
-    
     // update existing contact's number
     if(persons.map(person => person.name).includes(newName)){
       // filter for the contact
@@ -82,31 +104,51 @@ const App = () => {
         number: newNum,
         id: existingContactId
       }
-      if(window.confirm(`${newName} is already added to phonebook,update existing number to a new one?`)){
+      if(window.confirm(`${newName} is already added to phonebook,update existing number?`)){
         directoryService
           .update(existingContactId, updatedContactObject)
           .then(() =>{
             setPersons(persons.map(person => person))
-            alert("update successful")
-            window.location.reload();
-            } 
+            setNotificationMsg(`Updated ${newName}'s number`)
+            })
+          .catch(error => {
+            console.log("failed to update");
+            setNotificationMsg(`${newName} has already been removed from database`)
+            setTimeout(() => {setNotificationMsg(null)}, 5000);
+            }
           )
-          // .catch(alert("update unsuccessful"))
+          setTimeout(() => {
+            setNotificationMsg(null)
+            window.location.reload();
+          }, 3000);
+          setNotificationType("")
+          
       }
     }
     
-    // checks if number is invalid
-    if(regex.test(newNum)){
-      alert("please provide a valid number")
+    // checks if number is valid
+    if(regex.test(newNum) || newNum === ""){
+      // alert("please provide a valid number")
+      setNotificationType("invalid")
+      setNotificationMsg("please provide a valid number")
+      setTimeout(() => {
+        setNotificationMsg(null)
+      },5000);
     }
-    
     // create and post new contact into db
-    if(!(persons.map(person => person.name).includes(newName)) && (!regex.test(newNum))){
+    else{
       directoryService
         .create(contactObject)
-        .then(resp => setPersons(persons.concat(resp.data)))
+        .then( (resp) => {
+          setPersons(persons.concat(resp.data))
+          setNotificationType("add")
+          setNotificationMsg(`Added ${newName}`)
+        })
+        
+      setTimeout(() => setNotificationMsg(null), 5000);
       setNewName("")
       setNewNum("")
+      setNotificationType("")
     }
 
   }
@@ -114,6 +156,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notificationMsg={notificationMsg} notificationType={notificationType}/>
       <Filter newSearch={newSearch} handleNewSearch={handleNewSearch} />
       <h3>Add a new contact: </h3>
       <Form addNewContact={addNewContact} newName={newName} handleNewName={handleNewName} newNum={newNum} handleNewNum={handleNewNum} />
