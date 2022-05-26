@@ -5,6 +5,8 @@ import ContactList from './components/ContactList'
 import axios from 'axios'
 import directoryService from './services/phone-directory'
 
+const baseUrl = '/api/phonebook'
+
 const Notification = ({notificationMsg,notificationType}) => {
   let notificationStyle = {color: "blue"}
   if(notificationType === "add"){notificationStyle = {color: "green"}}
@@ -30,12 +32,13 @@ const App = () => {
   const [notificationMsg, setNotificationMsg] = useState()
   const [notificationType,setNotificationType] = useState()
 
-  // useEffect(()=>{
-  //   axios
-  //   .get("http://localhost:3001/persons")
-  //   .then(resp => setPersons(resp.data))
-  // },
-  // [])
+  useEffect(()=>{
+    axios
+    .get(baseUrl)
+    .then(resp => setPersons(resp.data))
+  },
+  [])
+  
   const personsHook = ()=>{
     directoryService
     .getAll()
