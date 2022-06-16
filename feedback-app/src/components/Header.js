@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 function Header({text, bgColor}) {
 
@@ -9,7 +10,9 @@ function Header({text, bgColor}) {
     <div>
         <header style={headerStyle}>
             <div className='container'>
-                <h2>{text}</h2>
+                <Link to="/">
+                    <h2>{text}</h2>
+                </Link>
             </div>
         </header>
     </div>

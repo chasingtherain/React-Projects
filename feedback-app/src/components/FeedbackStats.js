@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useContext } from 'react'
+import FeedbackContext from '../context/FeedbackContext'
 
-function FeedbackStats({feedback}) {
+function FeedbackStats() {
+    const {feedback} = useContext(FeedbackContext)
     let feedbackLength = (feedback.length) ? feedback.length : 0
-    // const [numOfFeedback, setNumOfFeedback] = useState(feedbackLength)
     let averageRating = (feedback.length) ? (feedback.reduce((acc,curr) => acc + curr.rating, 0)/feedbackLength).toFixed(2)
         : "No ratings yet"
         
